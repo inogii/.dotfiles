@@ -1,0 +1,9 @@
+export EDITOR="nvim"
+export PATH="$HOME/.local/bin:$PATH"
+export HISTSIZE=50000
+export HISTFILESIZE=100000
+export HISTCONTROL=ignoredups:erasedups
+export HISTIGNORE="ls:cd:pwd:exit:clear"
+export PROMPT_COMMAND="history -a; history -n; $PROMPT_COMMAND"
+export KUBECONFIG="$HOME/.kube/config"
+export DOCKER_BUILDKIT=1
