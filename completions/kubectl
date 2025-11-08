@@ -1,5 +1,0 @@
-# ~/.dotfiles/completions/kubectl
-if command -v kubectl >/dev/null 2>&1; then
-    kubectl completion bash > /tmp/kubectl_bash_completion 2>/dev/null
-    source /tmp/kubectl_bash_completion
-fi

@@ -1,5 +1,0 @@
-# ~/.dotfiles/completions/docker
-if command -v docker >/dev/null 2>&1; then
-    docker completion bash > /tmp/docker_bash_completion 2>/dev/null
-    source /tmp/docker_bash_completion
-fi
