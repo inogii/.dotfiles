@@ -1,24 +1,37 @@
-# --- Create and enter a directory ---
-mkcd() { mkdir -p "$1" && cd "$1" || return; }
+# ~/.dotfiles/prompt/bash_prompt.sh
+# ------------------------------------------------------------
+# Plain-text, portable Bash prompt with Git and Kubernetes info
+# ------------------------------------------------------------
 
-# --- Quick IP check ---
-myip() { curl -s ifconfig.me 2>/dev/null || echo "offline"; }
-
-# --- Reload shell without restart ---
-reload() { source ~/.bashrc; echo "🔁 Reloaded .bashrc"; }
-
-# --- Exec into first matching pod ---
-kexec() {
-  command -v kubectl >/dev/null 2>&1 || { echo "kubectl not found"; return 1; }
-  pod=$(kubectl get pods --no-headers 2>/dev/null | grep "$1" | head -n1 | awk '{print $1}')
-  [ -z "$pod" ] && { echo "No pod found matching $1"; return 1; }
-  kubectl exec -it "$pod" -- bash
+# --- Git branch + dirty state ---
+__git_ps1_simple() {
+    if command -v git >/dev/null 2>&1 && { [ -d .git ] || git rev-parse --is-inside-work-tree >/dev/null 2>&1; }; then
+        branch=$(git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short HEAD 2>/dev/null)
+        dirty=$(git status --porcelain 2>/dev/null | grep -q . && echo "*" || echo "")
+        echo -n "git:${branch}${dirty} "
+    fi
 }
 
-# --- Tail logs of first matching pod ---
-ktail() {
-  command -v kubectl >/dev/null 2>&1 || { echo "kubectl not found"; return 1; }
-  pod=$(kubectl get pods --no-headers 2>/dev/null | grep "$1" | head -n1 | awk '{print $1}')
-  [ -z "$pod" ] && { echo "No pod found matching $1"; return 1; }
-  kubectl logs -f "$pod"
+# --- Kubernetes context + namespace ---
+__kube_ps1() {
+    command -v kubectl >/dev/null 2>&1 || return
+    ctx=$(kubectl config current-context 2>/dev/null)
+    ns=$(kubectl config view --minify --output 'jsonpath={..namespace}' 2>/dev/null)
+    [ -n "$ctx" ] && echo -n "k8s:${ctx}${ns:+.$ns} "
 }
+
+# --- Optional: show last command duration (>3s) ---
+__last_cmd_time() {
+    [ -n "$LAST_CMD_DURATION" ] && [ "$LAST_CMD_DURATION" -gt 3 ] &&
+        printf "[%ss] " "$LAST_CMD_DURATION"
+}
+
+# --- Timing hook for command duration ---
+PROMPT_COMMAND='LAST_CMD_START=$SECONDS; history -a; history -n'
+trap 'LAST_CMD_DURATION=$((SECONDS - LAST_CMD_START))' DEBUG
+
+# --- Final prompt ---
+# Example output:
+# inigo@coe-hpc ~/projects git:main* k8s:minikube.default
+# ➜
+PS1="\u@\h \w \$(__git_ps1_simple)\$(__kube_ps1)\$(__last_cmd_time)\n➜ "
