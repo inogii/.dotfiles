@@ -1,4 +1,5 @@
 # ~/.dotfiles/completions/helm
 if command -v helm >/dev/null 2>&1; then
-    source <(helm completion bash)
+    helm completion bash > /tmp/helm_bash_completion 2>/dev/null
+    source /tmp/helm_bash_completion
 fi
