@@ -1,0 +1,45 @@
+# Main zsh config. Machine-specific things and secrets go in ~/.zshrc.local.
+DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
+ZSH_PLUGINS="${XDG_DATA_HOME:-$HOME/.local/share}/zsh/plugins"
+
+# --- Homebrew (macOS) ---
+[[ -x /opt/homebrew/bin/brew ]] && eval "$(/opt/homebrew/bin/brew shellenv)"
+
+# --- Shared exports and aliases ---
+for f in exports aliases; do
+  [[ -f "$DOTFILES/shell/$f.sh" ]] && source "$DOTFILES/shell/$f.sh"
+done
+command -v batcat >/dev/null 2>&1 && ! command -v bat >/dev/null 2>&1 && alias bat='batcat'
+
+# --- History ---
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=50000
+SAVEHIST=50000
+setopt HIST_IGNORE_DUPS HIST_IGNORE_SPACE HIST_REDUCE_BLANKS SHARE_HISTORY INC_APPEND_HISTORY
+
+# --- Behaviour ---
+setopt AUTO_CD INTERACTIVE_COMMENTS
+
+# --- Completion ---
+autoload -Uz compinit && compinit -d "${XDG_CACHE_HOME:-$HOME/.cache}/zcompdump"
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+
+# --- Up/Down search history by what's already typed ---
+autoload -Uz up-line-or-beginning-search down-line-or-beginning-search
+zle -N up-line-or-beginning-search
+zle -N down-line-or-beginning-search
+bindkey '^[[A' up-line-or-beginning-search
+bindkey '^[[B' down-line-or-beginning-search
+
+# --- Plugins (installed by install.sh; syntax-highlighting must load last) ---
+[[ -f "$ZSH_PLUGINS/zsh-autosuggestions/zsh-autosuggestions.zsh" ]] &&
+  source "$ZSH_PLUGINS/zsh-autosuggestions/zsh-autosuggestions.zsh"
+[[ -f "$ZSH_PLUGINS/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]] &&
+  source "$ZSH_PLUGINS/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+
+# --- Machine-specific overrides and secrets (not tracked) ---
+[[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
+
+# --- Prompt ---
+command -v starship >/dev/null 2>&1 && eval "$(starship init zsh)"

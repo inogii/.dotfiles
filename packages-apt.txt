@@ -1,0 +1,10 @@
+# Core packages for Debian/Ubuntu, one per line. Installed by install.sh.
+git
+git-lfs
+zsh
+curl
+neovim
+bat
+jq
+tree
+ncdu

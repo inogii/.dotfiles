@@ -1,0 +1,22 @@
+# Bash fallback config. zsh is the primary shell (see ../zsh/zshrc).
+DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
+
+for file in "$DOTFILES"/shell/{exports,aliases}.sh; do
+  [ -f "$file" ] && source "$file"
+done
+
+# --- History ---
+export HISTSIZE=50000
+export HISTFILESIZE=100000
+export HISTCONTROL=ignoredups:erasedups
+export HISTIGNORE="ls:cd:pwd:exit:clear"
+
+# --- Prompt: Starship if available, plain bash prompt otherwise ---
+if command -v starship >/dev/null 2>&1; then
+  eval "$(starship init bash)"
+else
+  [ -f "$DOTFILES/bash/prompt.sh" ] && source "$DOTFILES/bash/prompt.sh"
+fi
+
+# --- Machine-specific overrides and secrets (not tracked) ---
+[ -f ~/.bashrc.local ] && source ~/.bashrc.local

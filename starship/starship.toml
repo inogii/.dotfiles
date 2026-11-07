@@ -1,0 +1,35 @@
+# Starship prompt: replicates the old powerlevel9k look
+# (red user block, green conda/dir blocks, red " > " input marker).
+add_newline = false
+format = """
+$username$status$conda$python$directory
+$character"""
+
+[username]
+show_always = true
+style_user = "bg:red fg:white"
+style_root = "bg:red fg:white"
+format = "[ $user ]($style)[](fg:red bg:green)"
+
+[status]
+disabled = false
+style = "bg:green fg:red"
+format = "[ ✘$status]($style)"
+
+[conda]
+style = "bg:green fg:black"
+format = "[( \\($environment\\))]($style)"
+
+[python]
+style = "bg:green fg:black"
+format = "[( \\($virtualenv\\))]($style)"
+
+[directory]
+truncation_length = 1
+truncate_to_repo = false
+style = "bg:green fg:black"
+format = "[ $path ]($style)[](fg:green)"
+
+[character]
+success_symbol = "[ > ](bold bg:red fg:white)[](fg:red)"
+error_symbol = "[ > ](bold bg:red fg:white)[](fg:red)"
