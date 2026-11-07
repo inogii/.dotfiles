@@ -38,15 +38,17 @@ if [ "$PACKAGES" = 1 ]; then
     say "Installing apt packages"
     run sudo apt-get update
     run sudo apt-get install -y $(grep -vE '^\s*(#|$)' "$DOTFILES/packages-apt.txt")
-    if ! command -v starship >/dev/null 2>&1; then
-      say "Installing Starship to ~/.local/bin"
-      run mkdir -p "$HOME/.local/bin"
-      if [ "$DRY" = 1 ]; then
-        echo "    [dry-run] curl -sS https://starship.rs/install.sh | sh -s -- -y -b ~/.local/bin"
-      else
-        curl -sS https://starship.rs/install.sh | sh -s -- -y -b "$HOME/.local/bin"
-      fi
-    fi
+  fi
+fi
+
+# --- Starship on Linux (no sudo needed; brew handles it on macOS) ---
+if [ "$OS" = linux ] && ! command -v starship >/dev/null 2>&1 && [ ! -x "$HOME/.local/bin/starship" ]; then
+  say "Installing Starship to ~/.local/bin"
+  run mkdir -p "$HOME/.local/bin"
+  if [ "$DRY" = 1 ]; then
+    echo "    [dry-run] curl -sS https://starship.rs/install.sh | sh -s -- -y -b ~/.local/bin"
+  else
+    curl -sS https://starship.rs/install.sh | sh -s -- -y -b "$HOME/.local/bin"
   fi
 fi
 
